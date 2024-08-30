@@ -31,9 +31,9 @@ class MultiheadSelfAttention(torch.nn.Module):
 
         B, S, E = query.shape
 
-        Q: torch.Tensor = self.LQ(query).view(B, S, self.attention_head_n, E // self.attention_head_n).transpose(1, 2)
-        K: torch.Tensor = self.LK(key).view(B, S, self.attention_head_n, E // self.attention_head_n).transpose(1, 2)
-        V: torch.Tensor = self.LV(value).view(B, S, self.attention_head_n, E // self.attention_head_n).transpose(1, 2)
+        Q: torch.Tensor = self.LQ(query).view(B, -1, self.attention_head_n, E // self.attention_head_n).transpose(1, 2)
+        K: torch.Tensor = self.LK(key).view(B, -1, self.attention_head_n, E // self.attention_head_n).transpose(1, 2)
+        V: torch.Tensor = self.LV(value).view(B, -1, self.attention_head_n, E // self.attention_head_n).transpose(1, 2)
 
         energy = (Q @ K.transpose(-2, -1)) / math.sqrt(self.embd_dim)
 
@@ -193,7 +193,8 @@ class TS(nn.Module):
 if __name__ == "__main__":
     config = TSConfig()
     dummy = torch.randint(10, 100, size=(8, 512))
-    mask = torch.ones(size=(8, 512, 512))
+    target = torch.randint(10,100,size = (8,2))
+    mask = torch.ones(size=(8, 512)).unsqueeze(1)
     trg_mask = torch.tril(torch.ones((512, 512))).bool().unsqueeze(0)
     M = TS(config)
-    a = M(dummy,dummy, mask)
+    a = M(dummy,target, mask)
