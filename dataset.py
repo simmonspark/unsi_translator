@@ -33,7 +33,7 @@ class TSDataset(Dataset):
 
         input_data = tokenizer.encode(input_data)
 
-        key_pad_mask = add_padding([0] * len(input_data.ids), pad_id=1)
+        key_pad_mask = add_padding([1] * len(input_data.ids), pad_id=0)
 
         input_data = add_padding(input_data.ids)
 
