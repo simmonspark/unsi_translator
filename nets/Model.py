@@ -8,7 +8,7 @@ from config import TSConfig
 
 class MultiheadSelfAttention(torch.nn.Module):
     '''
-    key pad mask shape must be 8,512,512
+    key pad mask shape must be B,512,512
     trg mask shape must be 1,512,512
     '''
     def __init__(self, config):
