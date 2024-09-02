@@ -5,7 +5,7 @@ from tokenizers import Tokenizer
 tokenizer_path = "korean_tokenizer.json"
 tokenizer = Tokenizer.from_file(tokenizer_path)
 
-max_length = 512
+max_length = 128
 
 '''
 example as below

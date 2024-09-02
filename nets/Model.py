@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 from torch.nn import CrossEntropyLoss
 import torch.nn as nn
-from config import TSConfig
+from nets.config import TSConfig
 
 
 class MultiheadSelfAttention(torch.nn.Module):
@@ -38,7 +38,8 @@ class MultiheadSelfAttention(torch.nn.Module):
         energy = (Q @ K.transpose(-2, -1)) / math.sqrt(self.embd_dim)
 
         if mask is not None:
-            energy = energy.masked_fill(mask == 0, float('-inf'))
+            energy = energy.masked_fill(mask == False, float('-inf'))
+
         softmax_energy = F.softmax(energy, -1)
         result = softmax_energy @ V
         result = result.transpose(1, 2).contiguous().view(B, S, E)
@@ -94,7 +95,7 @@ class TransformerBlock(nn.Module):
         self.norm = nn.LayerNorm(config.embd_dim, bias=False)
 
     def forward(self, x, attention_mask=None):
-        x = self.att(x, x, x, mask)
+        x = self.att(x, x, x, attention_mask)
         res = x
         x = self.head(x)
         x = res + x

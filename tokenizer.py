@@ -13,7 +13,7 @@ trainer = trainers.WordPieceTrainer(
 
 tokenizer.train_from_iterator(dataset, trainer)
 
-encoded = tokenizer.encode("[START]my name is sieon?[EOS]")
+encoded = tokenizer.encode("[START] the translation is ")
 print(encoded.ids)
 decoded_string = tokenizer.decode(encoded.ids, skip_special_tokens=False)
 print(f'Decoded string -> {decoded_string}')
