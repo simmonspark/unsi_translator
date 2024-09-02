@@ -1,4 +1,3 @@
-from typing import Dict, Union, Any
 from nets.Model import TS, TSConfig
 import torch
 from torch import nn
@@ -22,7 +21,7 @@ cfg = TSConfig()
 model = TS(cfg)
 
 print('======================================')
-print('       시언이의 번역기 train process      ')
+print('   시언이의 번역기 base train process     ')
 print('======================================\n')
 print("Initializing a new model from scratch")
 print("defaulting to vocab_size 53000 (53004 rounded up for efficiency)\n")
@@ -86,8 +85,8 @@ best = 1e9
 for iter in range(epoch):
 
     g_loss = []
-    for D in tqdm(train_loader):
-        x, y, att_mask = D
+    for data in tqdm(train_loader):
+        x, y, att_mask = data
         x = x.to('cuda')
         y = y.to(torch.long).to('cuda')
         att_mask = att_mask.to('cuda').unsqueeze(1)

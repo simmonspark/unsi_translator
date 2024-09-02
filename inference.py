@@ -59,7 +59,7 @@ if mode == 'reg':
     print('Input Sentence : ', usr_input)
 
     max_token = 50
-    hiddin_sequence = torch.tensor([4, 3854, 9279, 3880], dtype=torch.long).unsqueeze(0).to('cuda')
+    hiddin_sequence = torch.tensor([4], dtype=torch.long).unsqueeze(0).to('cuda')
     encoded = torch.tensor(add_padding(tokenizer.encode(usr_input).ids), dtype=torch.long).unsqueeze(0).to('cuda')
     L = len(tokenizer.encode(usr_input).ids)
 
@@ -71,8 +71,8 @@ if mode == 'reg':
             encoder_out = model.encoder(encoded, attention_mask=key_pad_mask)
             attn_mask = model.make_trg_mask(hiddin_sequence)
 
-            logit = model.decoder(hiddin_sequence, encoder_out, key_pad_mask, attn_mask)
-
+            decoder_out = model.decoder(hiddin_sequence, encoder_out, key_pad_mask, attn_mask)
+            logit = model.fc_out(decoder_out)
             next_token = logit[:, -1, :]
             next_token = torch.argmax(next_token, dim=-1)
 
