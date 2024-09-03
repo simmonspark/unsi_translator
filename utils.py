@@ -2,18 +2,18 @@ import pandas as pd
 import os
 from tqdm import tqdm
 
+spetial_tokens = ['[START]', '[UNK]', '[EOS]', '[PAD]']
 
-spetial_tokens = ['[START]','[UNK]','[EOS]','[PAD]']
 
-def preprocess(dir:str = '/media/sien/DATA/DATA/dataset/ko_en_translator_data',mode = 'p'):
+def preprocess(dir: str = '/media/sien/DATA/DATA/dataset/ko_en_translator_data', mode='p'):
     try:
-        data_dic = {'input_idx' : [], 'target' : []}
+        data_dic = {'input_idx': [], 'target': []}
         full_list = []
         for high, _, name in os.walk(dir):
             for spesific in name:
                 path = os.path.join(high, spesific)
                 full_list.append(path)
-        for i in tqdm(full_list, desc= 'execl to dict converting ...'):
+        for i in tqdm(full_list, desc='execl to dict converting ...'):
             df = pd.read_excel(i)
             origin = df['원문'].values.tolist()
             trans = df['번역문'].values.tolist()
@@ -26,10 +26,15 @@ def preprocess(dir:str = '/media/sien/DATA/DATA/dataset/ko_en_translator_data',m
         if mode == 't':
             tmp = flatten_input_idx + flatten_target
             return tmp
+        if mode == 'a':
+            return dict(input_idx=flatten_input_idx[:2000], target=flatten_target[:2000]), dict(
+                input_idx=flatten_input_idx[2000:2050], target=flatten_target[2000:2050])
 
-        return dict(input_idx = flatten_input_idx[:20000], target = flatten_target[:20000]), dict(input_idx = flatten_input_idx[20000:20200], target = flatten_target[20000:20200])
+        return dict(input_idx=flatten_input_idx[:20000], target=flatten_target[:20000]), dict(
+            input_idx=flatten_input_idx[20000:20200], target=flatten_target[20000:20200])
     except Exception as e:
         print(f'error occur : {e.with_traceback()}')
+
 
 if __name__ == "__main__":
     preprocess()

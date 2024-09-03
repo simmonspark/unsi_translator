@@ -30,7 +30,7 @@ print('cuda amp GradScaler at 16bit cal [ON]')
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 print(f'TOKENIZERS_PARALLELISM [OFF]')
 
-t_data, v_data = preprocess()
+t_data, v_data = preprocess(mode='a')
 t_dataset = TSDataset(t_data)
 v_dataset = TSDataset(t_data)
 train_loader = DataLoader(t_dataset, batch_size=batch_size, pin_memory=True, pin_memory_device='cuda')
@@ -51,7 +51,8 @@ def cal_loss():
     print('\nvalidation start\n')
     model.eval()
     losses = []
-    for data in tqdm(val_loader):
+    loop = tqdm(train_loader, leave=True)
+    for data in loop:
         hiddin_sequence = torch.tensor([4], dtype=torch.long).unsqueeze(0).to('cuda')
         x, y, att_mask = data
         x = x.to('cuda')
@@ -72,13 +73,16 @@ def cal_loss():
             all_logits = torch.cat(all_logits, dim=1)
             loss = criterion(all_logits.view(-1, cfg.vocab_size), y.view(-1))
         losses.append(loss)
-        model.train()
+        loop.set_postfix(loss=loss.item())
+    model.train()
     print(f'val loss : {sum(losses) / len(losses)}')
     return sum(losses) / len(losses)
 
 
 max_token = 128
 best = 1e9
+
+
 
 for iter in range(epoch):
     g_loss = []
