@@ -20,16 +20,11 @@ model = model.to('cuda')
 tokenizer_path = "korean_tokenizer.json"
 tokenizer = Tokenizer.from_file(tokenizer_path)
 
-abs_path = '/media/sien/DATA/DATA/dataset/GFData/Training'
-spesific_path = 'use_ful'
-data_dir = os.path.join(abs_path, spesific_path)
-
-
 
 mode = 'reg'
 
 if mode == 'seq':
-    t_data, v_data = preprocess()
+    t_data, v_data = preprocess(mode = 'a')
     t_dataset = TSDataset(t_data)
     v_dataset = TSDataset(t_data)
     train_loader = DataLoader(t_dataset, batch_size=8, pin_memory=True, pin_memory_device='cuda', shuffle=True)

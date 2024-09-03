@@ -14,3 +14,5 @@ class TSConfig:
     decoder_layer_n: int = 6
     embd_dim: int = 768
     bias: bool = False
+#사드 ##를 배치 ##하면 그 지역의 땅 ##값이 오르 ##지 않고 , 이런 시설 때문에 그 지역에 피해가 크게 발생하기 때문입니다 .
+#$삼성  ##역까지 지하철로 42 ##분 정도 걸려 .

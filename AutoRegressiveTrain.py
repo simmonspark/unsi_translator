@@ -11,7 +11,7 @@ mode = 'resume'
 lr = 5e-6
 betas = (0.9, 0.95)
 epoch = 100
-batch_size = 2
+batch_size = 4
 compile = False
 
 criterion = nn.CrossEntropyLoss()
@@ -83,35 +83,31 @@ def cal_loss():
 max_token = 128
 best = 1e9
 
-
-
 for iter in range(epoch):
     g_loss = []
     loop = tqdm(train_loader, leave=True)
     for data in loop:
-        hiddin_sequence = torch.tensor([4], dtype=torch.long).unsqueeze(0).to('cuda')
-        hiddin_sequence = hiddin_sequence.repeat(batch_size, 1)
         x, y, att_mask = data
         x = x.to('cuda')
         y = y.to(torch.long).to('cuda')
         key_pad_mask = att_mask.to('cuda').unsqueeze(1)
+        hiddin_sequence = torch.tensor([4], dtype=torch.long).unsqueeze(0).repeat(batch_size, 1).to('cuda')
         optimizer.zero_grad()
         with torch.cuda.amp.autocast(enabled=True):
+            encoder_out = model.encoder(x, attention_mask=key_pad_mask)
             all_logits = []
             for i in range(max_token):
-                encoder_out = model.encoder(x, attention_mask=key_pad_mask)
                 attn_mask = model.make_trg_mask(hiddin_sequence)
                 decoder_out = model.decoder(hiddin_sequence, encoder_out, key_pad_mask, attn_mask)
                 logit = model.fc_out(decoder_out)
                 all_logits.append(logit[:, -1:, :])
-                next_token = torch.argmax(logit[:, -1, :], dim=-1)
-                next_token = next_token.unsqueeze(1)
+                next_token = torch.argmax(logit[:, -1, :], dim=-1).unsqueeze(1)
                 hiddin_sequence = torch.cat((hiddin_sequence, next_token), dim=-1)
             all_logits = torch.cat(all_logits, dim=1)
             loss = criterion(all_logits.view(-1, cfg.vocab_size), y.view(-1))
-            scaler.scale(loss).backward()
-            scaler.unscale_(optimizer)
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+        scaler.scale(loss).backward()
+        scaler.unscale_(optimizer)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         scaler.step(optimizer)
         scaler.update()
         g_loss.append(loss.item())
