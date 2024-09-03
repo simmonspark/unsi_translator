@@ -51,9 +51,10 @@ def cal_loss():
     print('\nvalidation start\n')
     model.eval()
     losses = []
-    loop = tqdm(train_loader, leave=True)
+    loop = tqdm(val_loader, leave=True)
     for data in loop:
         hiddin_sequence = torch.tensor([4], dtype=torch.long).unsqueeze(0).to('cuda')
+        hiddin_sequence = hiddin_sequence.repeat(batch_size, 1)
         x, y, att_mask = data
         x = x.to('cuda')
         y = y.to(torch.long).to('cuda')
